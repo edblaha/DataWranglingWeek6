@@ -1,0 +1,424 @@
+---
+title: "DWVAssignment6"
+format: pdf
+author: "Edward Blaha"
+execute:
+  echo: false
+---
+
+# 1.
+
+## Figure 1 Replication
+
+```{r}
+#spkath, colath, libath, spkrac, colrac, librac, spkcom, colcom, libcom, spkmil, colmil, libmil, spkhomo, colhomo, libhomo
+library(tidyverse)
+library(haven)
+library(arrow)
+
+
+gss <- read_dta('/Users/edwardblaha/DataWrangling/Week 6/GSS 1972-2024 Cumulative/gss7224_r1.dta')
+
+gss_by_year <- gss |>
+  group_by(year) |>
+  summarise(
+    mean_spkath = mean(spkath, na.rm = TRUE),
+    mean_colath = mean(colath, na.rm = TRUE),
+    mean_libath = mean(libath, na.rm = TRUE),
+    mean_spkrac = mean(spkrac, na.rm = TRUE),
+    mean_colrac = mean(colrac, na.rm = TRUE),
+    mean_librac = mean(librac, na.rm = TRUE),
+    mean_spkcom = mean(spkcom, na.rm = TRUE),
+    mean_colcom = mean(colcom, na.rm = TRUE),
+    mean_libcom = mean(libcom, na.rm = TRUE),
+    mean_spkmil = mean(spkmil, na.rm = TRUE),
+    mean_colmil = mean(colmil, na.rm = TRUE),
+    mean_libmil = mean(libmil, na.rm = TRUE),
+    mean_spkhomo = mean(spkhomo, na.rm = TRUE),
+    mean_colhomo = mean(colhomo, na.rm = TRUE),
+    mean_libhomo = mean(libhomo, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+gss_tolerance <- gss |> select(year,
+  spkath, colath, libath,
+  spkrac, colrac, librac,
+  spkcom, colcom, libcom,
+  spkmil, colmil, libmil,
+  spkhomo, colhomo, libhomo
+)|>
+  mutate(
+  spkath = case_when(
+    spkath == 1 ~ 0,
+    spkath == 2 ~ 1,
+    na_tag(spkath) == "d" ~ 1,
+    spkath != 1 & spkath != 2 & na_tag(spkath) != "d" ~ NA
+  ),
+  colath = case_when(
+    colath == 4 ~ 0,
+    colath == 5 ~ 1,
+    na_tag(colath) == "d" ~ 1,
+    colath != 4 & colath != 5 & na_tag(colath) != "d" ~ NA
+  ),
+  libath = case_when(
+    libath == 1 ~ 1,
+    libath == 2 ~ 0,
+    na_tag(libath) == "d" ~ 1,
+    libath != 1 & libath != 2 & na_tag(libath) != "d" ~ NA
+  ),
+
+  spkrac = case_when(
+    spkrac == 1 ~ 0,
+    spkrac == 2 ~ 1,
+    na_tag(spkrac) == "d" ~ 1,
+    spkrac != 1 & spkrac != 2 & na_tag(spkrac) != "d" ~ NA
+  ),
+  colrac = case_when(
+    colrac == 4 ~ 0,
+    colrac == 5 ~ 1,
+    na_tag(colrac) == "d" ~ 1,
+    colrac != 4 & colrac != 5 & na_tag(colrac) != "d" ~ NA
+  ),
+  librac = case_when(
+    librac == 1 ~ 1,
+    librac == 2 ~ 0,
+    na_tag(librac) == "d" ~ 1,
+    librac != 1 & librac != 2 & na_tag(librac) != "d" ~ NA
+  ),
+
+  spkcom = case_when(
+    spkcom == 1 ~ 0,
+    spkcom == 2 ~ 1,
+    na_tag(spkcom) == "d" ~ 1,
+    spkcom != 1 & spkcom != 2 & na_tag(spkcom) != "d" ~ NA
+  ),
+  colcom = case_when(
+    colcom == 4 ~ 1,
+    colcom == 5 ~ 0,
+    na_tag(colcom) == "d" ~ 1,
+    colcom != 4 & colcom != 5 & na_tag(colcom) != "d" ~ NA
+  ),
+  libcom = case_when(
+    libcom == 1 ~ 1,
+    libcom == 2 ~ 0,
+    na_tag(libcom) == "d" ~ 1,
+    libcom != 1 & libcom != 2 & na_tag(libcom) != "d" ~ NA
+  ),
+
+  spkmil = case_when(
+    spkmil == 1 ~ 0,
+    spkmil == 2 ~ 1,
+    na_tag(spkmil) == "d" ~ 1,
+    spkmil != 1 & spkmil != 2 & na_tag(spkmil) != "d" ~ NA
+  ),
+  colmil = case_when(
+    colmil == 4 ~ 0,
+    colmil == 5 ~ 1,
+    na_tag(colmil) == "d" ~ 1,
+    colmil != 4 & colmil != 5 & na_tag(colmil) != "d" ~ NA
+  ),
+  libmil = case_when(
+    libmil == 1 ~ 1,
+    libmil == 2 ~ 0,
+    na_tag(libmil) == "d" ~ 1,
+    libmil != 1 & libmil != 2 & na_tag(libmil) != "d" ~ NA
+  ),
+
+  spkhomo = case_when(
+    spkhomo == 1 ~ 0,
+    spkhomo == 2 ~ 1,
+    na_tag(spkhomo) == "d" ~ 1,
+    spkhomo != 1 & spkhomo != 2 & na_tag(spkhomo) != "d" ~ NA
+  ),
+  colhomo = case_when(
+    colhomo == 4 ~ 0,
+    colhomo == 5 ~ 1,
+    na_tag(colhomo) == "d" ~ 1,
+    colhomo != 4 & colhomo != 5 & na_tag(colhomo) != "d" ~ NA
+  ),
+  libhomo = case_when(
+    libhomo == 1 ~ 1,
+    libhomo == 2 ~ 0,
+    na_tag(libhomo) == "d" ~ 1,
+    libhomo != 1 & libhomo != 2 & na_tag(libhomo) != "d" ~ NA
+  ),
+    tolerance = rowSums(
+  across(c(
+    spkath, colath, libath,
+    spkrac, colrac, librac,
+    spkcom, colcom, libcom,
+    spkmil, colmil, libmil,
+    spkhomo, colhomo, libhomo
+  ))
+ 
+))
+
+tolerance_by_year <- gss_tolerance |> filter(!is.na(tolerance))|>
+  group_by(year) |>
+  summarise(mean_tolerance = mean(tolerance, na.rm = TRUE), 
+            .groups = "drop")
+
+
+
+library(ggplot2)
+
+ggplot(
+  tolerance_by_year |> filter(year >= 1975 & year <= 1998),
+  aes(x = year, y = mean_tolerance)
+) +
+  geom_line()+
+  labs(
+    x = "Year",
+    y = "GSS Modified Stouffer Battery"
+  )  +
+  scale_x_continuous(
+    limits = c(1976, 1998),
+    breaks = c(1976,1998)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 15),
+    breaks = seq(0, 15, 3)
+  ) + 
+  annotate(geom = "text", x = 1977, y = 8.5, label = "7.24 (1977)") + 
+  annotate(geom = "text", x = 1997.5, y = 6.5, label = "5.28 (1998)") 
+```
+
+## Figure 2 Replication
+
+```{r}
+Intolerance_racist <-  gss_tolerance |> mutate(int_racist = rowSums(
+  across(c(librac, colrac,spkrac)))) |>
+  group_by(year) |>
+  summarise(mean_tolerance_racist = mean(int_racist, na.rm = TRUE), 
+            .groups = "drop")
+
+Intolerance_homosexual <-  gss_tolerance |> mutate(int_homosexual = rowSums(
+  across(c(spkhomo, colhomo, libhomo)))) |>
+  group_by(year) |>
+  summarise(mean_tolerance_homosexual = mean(int_homosexual, na.rm = TRUE), 
+            .groups = "drop")
+
+
+
+racist_filtered <- Intolerance_racist |> filter(!is.na(mean_tolerance_racist))|>    filter(year >= 1975 & year <= 1998)
+homosexual_filtered <- Intolerance_homosexual |> filter(!is.na(mean_tolerance_homosexual))|>  filter(year >= 1975 & year <= 1998)
+
+ggplot() + geom_line(data = racist_filtered, aes(x = year, y = mean_tolerance_racist)) + geom_line(data = homosexual_filtered, aes(x = year, y = mean_tolerance_homosexual))+
+  labs(
+    x = "Year",
+    y = "Intolerance out of three"
+  )  +
+  scale_x_continuous(
+    limits = c(1976, 1998),
+    breaks = c(1976,1998)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 3),
+  ) + 
+  annotate(geom = "text", x = 1981, y = 1.6, label = "Racists", size = 3, color = "darkred") + 
+  annotate(geom = "text", x = 1979, y = 1, label = "1.34 (1977)")+
+  annotate(geom = "text", x = 1985, y = 1.6, label = "1.43 (1985)")+ 
+  annotate(geom = "text", x = 1997, y = 1.5, label = "1.28 (1998)")+
+  annotate(geom = "text", x = 1985, y = 1, label = "Homosexuals", size = 3, color = "darkred") + annotate(geom = "text", x = 1997, y = 0.6, label = "0.75 (1996-98)") + annotate(geom = "point", x = c(1977, 1985, 1998, 1998), y = c(1.34, 1.43, 1.28, 0.75))
+  
+
+
+```
+
+## Figure 3 Replication
+
+```{r}
+#accidentally did this before realizing that I was supposed to do 5, so I have kept both. 
+#used "after_stat" command to do calculation within the ggplot function. Used the internet to find out how to do this, and how to use count/sum(count), to get a proportion of total for the Y axis instead of raw count. 
+ gss_tolerance_1976_1998 <- gss_tolerance |> filter(year >= 1976, year <= 1998)
+
+ggplot( gss_tolerance_1976_1998, aes(x = tolerance, y = after_stat((count / sum(count)*100)))) + 
+geom_bar() + labs(x = "Number of Acts Toward Which Respondents Express Intolerance (1976-1998)", y = "Percentage of Cases"
+  ) 
+
+```
+
+## Figure 5 Replication
+
+```{r}
+tolerance_by_year_prop <- gss_tolerance_1976_1998 |>
+  group_by(year) |>
+  summarise(
+    proportion_nonzero = mean(tolerance > 0, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+
+tolerance_by_year_prop <- tolerance_by_year_prop |> filter(!is.na(proportion_nonzero))|>  filter(year >= 1975 & year <= 1998)
+
+
+ggplot(tolerance_by_year_prop, aes(x = year, y = proportion_nonzero)) +
+  geom_line() +
+  labs(
+    x = "Year",
+    y = "Proportion of Respondents with More Than 0 Intolerant Beliefs"
+  ) +
+  scale_y_continuous(limits = c(0, 1))+ annotate(geom = "text", x = 1988, y = 0.9, label = "0.85 (1988)") + annotate(geom = "text", x = 1996, y = 0.7, label = "0.79 (1998)") + annotate(geom = "point", x = c(1988,1998), y = c(0.85, 0.79))
+  
+
+
+```
+
+## 2. Extension of Figures through 2024
+
+Figure 1 Extended
+
+```{r}
+ggplot(
+  tolerance_by_year |> filter(!is.na(mean_tolerance))|>  filter(year >= 1975 & year <= 2024),
+  aes(x = year, y = mean_tolerance)
+) +
+  geom_line()+
+  labs(
+    x = "Year",
+    y = "GSS Modified Stouffer Battery"
+  )  +
+  scale_x_continuous(
+    limits = c(1976, 2024),
+    breaks = c(1976,2024)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 15),
+    breaks = seq(0, 15, 3)
+  ) + 
+  annotate(geom = "text", x = 1979, y = 8.5, label = "7.24 (1977)") + 
+  annotate(geom = "text", x = 1997.5, y = 6.5, label = "5.28 (1998)") 
+```
+
+Figure 2 Extended
+
+```{r}
+racist_filtered2 <- Intolerance_racist |> filter(!is.na(mean_tolerance_racist))|>  filter(year >= 1975 & year <= 2024)
+homosexual_filtered2 <- Intolerance_homosexual |> filter(!is.na(mean_tolerance_homosexual))|>  filter(year >= 1975 & year <= 2024)
+
+ggplot() + geom_line(data = racist_filtered2, aes(x = year, y = mean_tolerance_racist)) + geom_line(data = homosexual_filtered2, aes(x = year, y = mean_tolerance_homosexual))+
+  labs(
+    x = "Year",
+    y = "Intolerance out of three"
+  )  +
+  scale_x_continuous(
+    limits = c(1976, 2024),
+    breaks = c(1976,2024)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 3),
+  )+ 
+  annotate(geom = "text", x = 1981, y = 1.6, label = "Racists", size = 2, color = "darkred") + 
+  annotate(geom = "text", x = 1979, y = 1, label = "1.34 (1977)", size = 2)+
+  annotate(geom = "text", x = 1985, y = 1.6, label = "1.43 (1985)", size = 2)+ 
+  annotate(geom = "text", x = 1997, y = 1.5, label = "1.28 (1998)", size = 2)+
+  annotate(geom = "text", x = 1985, y = 1, label = "Homosexuals", size = 2, color = "darkred") + annotate(geom = "text", x = 1997, y = 0.6, label = "0.75 (1996-98)", size = 2) + annotate(geom = "point", x = c(1977, 1985, 1998, 1998), y = c(1.34, 1.43, 1.28, 0.75))
+```
+
+Figure 5 extended
+
+```{r}
+#Figure 5 Replication cont'd
+
+ gss_tolerance_1976_2024 <- gss_tolerance |> filter(year >= 1976, year <= 2024)
+
+tolerance_by_year_prop_2 <- gss_tolerance_1976_2024 |>
+  group_by(year) |>
+  summarise(
+    proportion_nonzero = mean(tolerance > 0, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+
+tolerance_by_year_prop_2 <- tolerance_by_year_prop_2 |> filter(!is.na(proportion_nonzero))
+
+
+ggplot(tolerance_by_year_prop_2, aes(x = year, y = proportion_nonzero)) +
+  geom_line() +
+  labs(
+    x = "Year",
+    y = "Proportion of Respondents with More Than 0 Intolerant Beliefs"
+  ) +
+  scale_y_continuous(limits = c(0, 1))+ annotate(geom = "text", x = 1988, y = 0.9, label = "0.85 (1988)") + annotate(geom = "text", x = 1996, y = 0.7, label = "0.79 (1998)") + annotate(geom = "point", x = c(1988,1998), y = c(0.85, 0.79))
+  
+
+
+```
+
+## 3.
+
+Original Work: explore the codebook for the GSS. Find two interesting variables and create compelling univariate graphs to illustrate their central tendency, distribution, and spread.
+
+```{r}
+gss_guns<- gss |> select(year, gunlaw )|>
+  mutate(
+  gunlaw = case_when(
+    gunlaw == 1 ~ 0,
+    gunlaw == 2 ~ 1,
+    gunlaw != 1 & gunlaw != 2  ~ NA
+  ))
+guns_by_year <- gss_guns |> filter(!is.na(gunlaw))|>
+  group_by(year) |>
+  summarise(mean_guns = mean(gunlaw, na.rm = TRUE), 
+            .groups = "drop")
+
+
+
+ggplot() + geom_line(data = guns_by_year, aes(x = year, y = mean_guns)) +
+  labs(
+    x = "Year",
+    y = "Opposition to Gun Control"
+  )  +
+  scale_x_continuous(
+    limits = c(1976, 2024),
+    breaks = c(1976,2024)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 0.5),
+  ) + annotate(geom = "point", x = (1996), y = 0.1795962) + annotate (geom = "text", x = 1996, y = 0.125, label = "Fox News Founded (No causal relationship established by this graph. Label placed as plausible hypothesis.)", size = 2)
+```
+
+```{r}
+gss_grass<- gss |> select(year, grass )|>
+  mutate(
+  grass = case_when(
+    grass== 1 ~ 0,
+    grass == 2 ~ 1,
+    grass != 1 & grass != 2  ~ NA
+  ))
+grass_by_year <- gss_grass |> filter(!is.na(grass))|>
+  group_by(year) |>
+  summarise(mean_grass = mean(grass, na.rm = TRUE), 
+            .groups = "drop")
+
+
+
+ggplot() + geom_line(data = grass_by_year, aes(x = year, y = mean_grass)) +
+  labs(
+    x = "Year",
+    y = "Opposition to Marijuana Legalization"
+  )  +
+  scale_x_continuous(
+    limits = c(1976, 2024),
+    breaks = c(1976,2024)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+  ) + annotate(geom = "point", x = (1996), y = 0.73) + annotate (geom = "text", x = 1996, y = 0.6, label = "California Legalizes Medical Marijuana", size = 3, color = "darkgreen")+ annotate(geom = "point", x = (2012), y = 0.53) + annotate (geom = "text", x = 2012, y = 0.4, label = "CO and WA Legalize Recreational Marijuana", size = 3, color = "darkgreen")
+```
+
+## 4
+
+1.  Where did you encounter problems with this replication? Was there anything that was particularly tricky?
+
+At first, my replication failed because I did not realize that NAs coded as "d" counted as intolerant expressions. I also did not know a lot of necessary ggplot2 syntax, so I had to consult the ggplot2 cheat sheet and use google to find syntax.
+
+2.  How would you interpret (in other words, explain to a general audience) what Mondak and Sanders found in figures 1, 2, and 5?
+
+Figure 1 demonstrates that from 1976-1998, the American public became more tolerant of various groups. Figure 2 demonstrated that this increase in tolerance was greater for homosexuality than for racism (which is itself an intolerant belief system).
+
+Figure 5 demonstrates that a substantial minority of respondents hold 0 of 15 intolerant beliefs. This pattern may suggest that these individuals hold a broader, consistent orientation toward tolerance rather than attitudes driven primarily by biases toward particular groups. One possible explanation is that they place greater value on principles such as freedom of speech. The relatively even distribution across the remaining 14 categories, by contrast, suggests that responses may be shaped more by individuals’ attitudes toward specific groups than by an ideology of tolerance. This minority has increased over time, suggesting that an ideology of total tolerance is growing.
+
+3.  Has anything changed since 1998 that would alter the substantive takeaway points in their findings?
+
+Tolerance has continued to increase, but intolerance of racism, which itself a hateful and intolerant ideology, has increased. Tolerance seems to be modulated by the harm caused to others by the group in question. The proportion of people with at least one intolerant belief has thus increased (extension of 5), but this is likely because fewer people are tolerant of racists.
